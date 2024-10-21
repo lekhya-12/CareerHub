@@ -54,6 +54,7 @@ const LoginComponent = () => {
                             <h3 className="mb-4 text-center">Login</h3>
                             {/* Employee ID input */}
                             <div className="form-outline mb-4">
+                                <label className="form-label" htmlFor="form3Example1">Employee ID</label>
                                 <input 
                                     type="text" 
                                     id="form3Example1" 
@@ -63,11 +64,12 @@ const LoginComponent = () => {
                                     onChange={(e) => setEmpId(e.target.value)}
                                     required
                                 />
-                                <label className="form-label" htmlFor="form3Example1">Employee ID</label>
+                                
                             </div>
 
                             {/* Password input */}
                             <div className="form-outline mb-3">
+                                <label className="form-label" htmlFor="form3Example4">Password</label>
                                 <input 
                                     type="password" 
                                     id="form3Example4" 
@@ -77,7 +79,7 @@ const LoginComponent = () => {
                                     onChange={(e) => setPassword(e.target.value)}
                                     required
                                 />
-                                <label className="form-label" htmlFor="form3Example4">Password</label>
+                                
                             </div>
 
                             {/* User type selection */}
