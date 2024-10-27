@@ -1,11 +1,10 @@
-
 import React, { useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom'; 
 import UserContext from './UserContext';
 
-const NavbarComponent = ({ userRole }) => {
+const NavbarComponent = () => {
   const navigate = useNavigate();
-  const { empId } = useContext(UserContext);
+  const { empId, userRole } = useContext(UserContext); // Retrieve userRole from context
 
   const handleLogout = () => {
     alert('Logged out');
@@ -13,24 +12,26 @@ const NavbarComponent = ({ userRole }) => {
   };
 
   const handleHomeClick = () => {
-    if (userRole === 'employee') {
-      navigate('/employee-home');
-    } else if (userRole === 'hr') {
-      navigate('/hr-home');
-    } else{
-      navigate('/admin-home');
-    }
+    navigate('/homepage',{ state: { userRole } })
   };
 
   const handleJobsClick = () => {
     if (userRole === 'employee') {
-      navigate('/employee-dashboard', { state: { empId } });
+      navigate('/emp-job', { state: { empId } });
     } else if (userRole === 'hr') {
-      navigate('/hr-dashboard');
+      navigate('/hr-job');
     } else if (userRole === 'admin') {
       navigate('/admin-dashboard');
     }
   };
+
+  const handleAccountInfoClick = () => {
+    navigate('/profile', { state: { empId, userRole } });
+  };
+  
+  const handleAppliedJobsClick = () => {
+    navigate('/applied-jobs', { state: { empId } });
+  }
 
   return (
     <nav className="navbar navbar-expand-md navbar-dark bg-dark" style={{
@@ -45,13 +46,29 @@ const NavbarComponent = ({ userRole }) => {
         </a>
         <div className="collapse navbar-collapse" id="navbarSupportedContent">
           <ul className="navbar-nav me-auto mb-2 mb-lg-0">
-            <li className="nav-item">
+            <li className="nav-item" style={{ marginRight: '15px' }}>
               <a className="nav-link active" aria-current="page" href="#" onClick={handleHomeClick}>Home</a>
             </li>
-            <li className="nav-item">
-              <a className="nav-link active" href="#" onClick={handleJobsClick}>Jobs</a>
+            <li className="nav-item" style={{ marginRight: '15px' }}>
+              {userRole === 'admin' ? (
+                <a className="nav-link active" href="#" onClick={handleJobsClick}>Dashboard</a>
+              ) : userRole === 'hr' ? (
+                <a className="nav-link active" href="#" onClick={handleJobsClick}>Job Postings</a>
+              ) : (
+                <a className="nav-link active" href="#" onClick={handleJobsClick}>Jobs</a>
+              )}
+            </li>
+
+            {userRole === 'employee' && (
+              <li className="nav-item" style={{ marginRight: '15px' }}>
+                <a className="nav-link active" href="#" onClick={handleAppliedJobsClick}>Applied Jobs</a>
+              </li>
+            )}
+            <li className="nav-item" style={{ marginRight: '15px' }}>
+              <a className="nav-link active" href="#" onClick={handleAccountInfoClick}>Profile</a>
             </li>
           </ul>
+
           <button className="btn btn-outline-danger" onClick={handleLogout}>Logout</button>
         </div>
       </div>

@@ -1,15 +1,15 @@
-
-import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import React, { useState, useEffect } from 'react'; 
+
 
 const ViewApplicantsModal = ({ jobId, onClose, handleApprove, handleReject }) => {
   const [jobApplicants, setJobApplicants] = useState([]);
-
+  const [selectedApplicant, setSelectedApplicant] = useState(null); 
+  const [applicantDetails, setApplicantDetails] = useState(null); 
   useEffect(() => {
     const fetchJobApplicants = async () => {
       try {
         const response = await axios.get(`http://localhost:3128/job/view/${jobId}`);
-        console.log('Applicants fetched:', response.data); // Debugging: Log the applicants data
         setJobApplicants(response.data);
       } catch (error) {
         console.error('Error fetching job applicants:', error);
@@ -18,6 +18,20 @@ const ViewApplicantsModal = ({ jobId, onClose, handleApprove, handleReject }) =>
 
     fetchJobApplicants();
   }, [jobId]);
+
+  const fetchApplicantDetails = async (empId) => {
+    try {
+      const response = await axios.get(`http://localhost:3128/hr/emp/${empId}`); 
+      setApplicantDetails(response.data);
+    } catch (error) {
+      console.error('Error fetching applicant details:', error);
+    }
+  };
+
+  const handleApplicantClick = (applicant) => {
+    setSelectedApplicant(applicant);
+    fetchApplicantDetails(applicant.empId); 
+  };
 
   return (
     <div className="modal fade show" tabIndex="-1" style={{ display: 'block', backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
@@ -29,40 +43,69 @@ const ViewApplicantsModal = ({ jobId, onClose, handleApprove, handleReject }) =>
           </div>
           <div className="modal-body">
             {jobApplicants.length > 0 ? (
-              <table className="table">
-                <thead>
-                  <tr>
-                    <th>Employee ID</th>
-                    <th>Email</th>
-                    <th>Mobile Number</th>
-                    <th>Status</th>
-                    {/* <th>Actions</th> */}
-                  </tr>
-                </thead>
-                <tbody>
-                  {jobApplicants.map((applicant) => (
-                    <tr key={applicant.empId}>
-                      <td>{applicant.empId}</td>
-                      <td>{applicant.email}</td>
-                      <td>{applicant.mobileNumber}</td>
-                      <td>
-                      <span>{applicant.status === 'approve' ? 'Approved' : applicant.status=='pending' ? 'Pending' : 'Rejected'}</span></td> {/* Display the status */}
-                      <td>
-                        {applicant.status === 'pending' ? (
-                          <>
-                            <button className="btn btn-success" onClick={() => handleApprove(jobId, applicant.empId)}>Approve</button>
-                            <button className="btn btn-danger ms-2" onClick={() => handleReject(jobId, applicant.empId)}>Reject</button>
-                          </>
-                        ) : (null
-                          // <span>{applicant.status === 'approved' ? 'Approved' : 'Rejected'}</span>
+              <div>
+                <h5>Select an applicant to view details:</h5>
+                <ul className="list-group">
+                  {jobApplicants.map((applicant) => {
+                  console.log(applicant);
+                  return(
+                    
+                    <li
+                      key={applicant.empId}
+                      className="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
+                      onClick={() => handleApplicantClick(applicant)}
+                    >
+                      <div>
+                        {applicant.empId}
+                      </div>
+                      <div>
+                        {/* Display applicant's status */}
+                        {applicant.status === 'approve' ? (
+                          <span className="badge bg-success">Approved</span>
+                        ) : applicant.status === 'reject' ? (
+                          <span className="badge bg-danger">Rejected</span>
+                        ) : (
+                          <span className="badge bg-warning">Pending</span>
                         )}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+                      </div>
+                    </li>
+                  );
+                  })}
+                </ul>
+              </div>
             ) : (
               <p>No applicants found</p>
+            )}
+
+            {/* Display selected applicant details */}
+            {selectedApplicant && applicantDetails && (
+              <div className="mt-4">
+                <h5>Applicant Details</h5>
+                <p><strong>Employee ID:</strong> {applicantDetails.empId}</p>
+                <p><strong>Name:</strong> {applicantDetails.name}</p>
+                <p><strong>Email:</strong> {applicantDetails.email}</p>
+                <p><strong>Phone:</strong> {applicantDetails.mobileNumber}</p>
+                <p><strong>Age:</strong> {applicantDetails.age}</p>
+                <p><strong>Gender:</strong> {applicantDetails.gender}</p>
+
+                {/* Approve and Reject buttons */}
+                {selectedApplicant.status === 'pending' && (
+                  <div className="mt-3">
+                    <button
+                      className="btn btn-success"
+                      onClick={() => handleApprove(jobId, selectedApplicant.empId)}
+                    >
+                      Approve
+                    </button>
+                    <button
+                      className="btn btn-danger ms-2"
+                      onClick={() => handleReject(jobId, selectedApplicant.empId)}
+                    >
+                      Reject
+                    </button>
+                  </div>
+                )}
+              </div>
             )}
           </div>
           <div className="modal-footer">
@@ -77,3 +120,4 @@ const ViewApplicantsModal = ({ jobId, onClose, handleApprove, handleReject }) =>
 };
 
 export default ViewApplicantsModal;
+

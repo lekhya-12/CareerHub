@@ -13,7 +13,6 @@ const AdminDashboard = () => {
         const response = await axios.get('http://localhost:3128/job/details');
         const allEmployees = response.data;
         
-        // Separate employees and HRs
         const employees = allEmployees.filter(emp => emp.role === 'employee');
         const hrs = allEmployees.filter(emp => emp.role === 'hr');
         
@@ -29,7 +28,7 @@ const AdminDashboard = () => {
 
   return (
     <>
-      <NavbarComponent />
+      <NavbarComponent userRole={'admin'} />
       <div className="container mt-5">
         <div className="row py-2">
           <div className=" text-center col-lg-6 col-md-8 mx-auto">
@@ -47,16 +46,22 @@ const AdminDashboard = () => {
                   <thead className="thead-dark">
                     <tr>
                       <th>Employee ID</th>
+                      <th>Name</th>
                       <th>Email</th>
                       <th>Mobile Number</th>
+                      <th>Age</th>
+                      <th>Gender</th>
                     </tr>
                   </thead>
                   <tbody>
                     {hrs.map(hr => (
                       <tr key={hr._id}>
                         <td>{hr.empId}</td>
+                        <td>{hr.name}</td>
                         <td>{hr.email}</td>
                         <td>{hr.mobileNumber}</td>
+                        <td>{hr.age}</td>
+                        <td>{hr.gender}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -74,17 +79,23 @@ const AdminDashboard = () => {
                 <table className="table table-hover table-striped table-bordered">
                   <thead className="thead-dark">
                     <tr>
-                      <th>Employee ID</th>
+                    <th>Employee ID</th>
+                      <th>Name</th>
                       <th>Email</th>
                       <th>Mobile Number</th>
+                      <th>Age</th>
+                      <th>Gender</th>
                     </tr>
                   </thead>
                   <tbody>
                     {employees.map(employee => (
                       <tr key={employee._id}>
                         <td>{employee.empId}</td>
+                        <td>{employee.name}</td>
                         <td>{employee.email}</td>
                         <td>{employee.mobileNumber}</td>
+                        <td>{employee.age}</td>
+                        <td>{employee.gender}</td>
                       </tr>
                     ))}
                   </tbody>

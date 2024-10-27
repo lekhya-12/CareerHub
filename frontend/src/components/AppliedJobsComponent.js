@@ -1,19 +1,20 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import axios from 'axios';
 import { useLocation } from 'react-router-dom';
 import NavbarComponent from './NavBarComponent';
+import UserContext from './UserContext';
 
 const AppliedJobsComponent = () => {
   const [appliedJobs, setAppliedJobs] = useState([]);
   const location = useLocation();
-  const { empId } = location.state;
+  const { empId: contextEmpId } = useContext(UserContext);
+  const empId = location.state?.empId || contextEmpId;
 
   useEffect(() => {
     const fetchAppliedJobs = async () => {
       try {
         const response = await axios.get(`http://localhost:3128/job/applied/${empId}`);
-        console.log('Fetched applied jobs:', response.data);
         setAppliedJobs(response.data);
       } catch (error) {
         console.error('Error fetching applied jobs:', error);
@@ -22,24 +23,23 @@ const AppliedJobsComponent = () => {
     fetchAppliedJobs();
   }, [empId]);
 
-  // Function to determine card color based on job status
   const getCardColorStyle = (status) => {
     switch (status) {
       case 'approve':
         return {
-          background: 'linear-gradient(to bottom right, #5bff76, #aaff9d)', // Lighter green gradient for approved jobs
+          background: 'linear-gradient(to bottom right, #5bff76, #aaff9d)',
         };
       case 'reject':
         return {
-          background: 'linear-gradient(to bottom right, #ff5b5b, #ff9d9d)', // Lighter red gradient for rejected jobs
+          background: 'linear-gradient(to bottom right, #ff5b5b, #ff9d9d)',
         };
       case 'pending':
         return {
-          background: 'linear-gradient(to bottom right, #ffeb3b, #fffb9d)', // Lighter yellow gradient for pending jobs
+          background: 'linear-gradient(to bottom right, #ffeb3b, #fffb9d)',
         };
       default:
         return {
-          background: '#f8f9fa', // Default light background
+          background: '#f8f9fa',
         };
     }
   };
@@ -47,34 +47,43 @@ const AppliedJobsComponent = () => {
   return (
     <main>
       <NavbarComponent userRole={'employee'} />
-      <section className="py-2 text-center container">
+      <section className="py-4 text-center container">
         <div className="row py-2">
-          <div className="col-lg-6 col-md-8 mx-auto">
+          <div className="col-lg-8 col-md-10 mx-auto">
             <h1 className="fw-light">Applied Jobs</h1>
-            <p className="lead text-muted">Here are the jobs you have applied for.</p>
+            <p className="lead text-muted">These are the jobs you've applied for. Stay updated on their status here.</p>
           </div>
         </div>
       </section>
+
       <div className="album py-5 bg-light">
         <div className="container">
-          <div className="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
+          <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
             {appliedJobs.length > 0 ? (
               appliedJobs.map((job) => (
                 <div className="col" key={job.jobId}>
-                  <div className="card shadow-sm" style={getCardColorStyle(job.status)}>
-                    <div className="card-body">
-                      <h5 className="card-title">{job.jobTitle}</h5>
-                      <p className="card-text">{job.jobDesc}</p>
-                      <p className="card-text">Location: {job.jobLocation}</p>
-                      <p className="card-text">Salary: {job.salary}</p>
-                      <p className="card-text">Job Type: {job.jobType}</p>
-                      <p className="card-text">Status: {job.status}</p>
+                  <div className="card shadow-sm h-100" style={{ ...getCardColorStyle(job.status), borderRadius: '8px' }}>
+                    <div className="card-body d-flex flex-column">
+                      <h5 className="card-title mb-2">{job.jobTitle}</h5>
+                      <p className="card-text text-muted mb-4">{job.jobDesc}</p>
+
+                      <div className="mb-3">
+                        <p className="card-text"><strong>Location:</strong> {job.jobLocation}</p>
+                        <p className="card-text"><strong>Salary:</strong> {job.salary}</p>
+                        <p className="card-text"><strong>Job Type:</strong> {job.jobType}</p>
+                      </div>
+
+                      <div className="mt-auto">
+                        <p className="card-text fw-bold">
+                          Status: {job.status === 'approve' ? 'Approved' : job.status === 'reject' ? 'Rejected' : 'Pending'}
+                        </p>
+                      </div>
                     </div>
                   </div>
                 </div>
               ))
             ) : (
-              <p className="lead text-muted">You have not applied for any jobs</p>
+              <div className="text-center text-muted">You have not applied for any jobs yet.</div>
             )}
           </div>
         </div>

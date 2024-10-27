@@ -10,7 +10,6 @@ const JobComponent = () => {
     const fetchJobs = async () => {
       try {
         const response = await axios.get('http://localhost:3128/job/home');
-        console.log('Fetched jobs:', response.data); // Log fetched data
         setJobs(response.data);
       } catch (error) {
         console.error('Error fetching jobs:', error);
@@ -20,7 +19,7 @@ const JobComponent = () => {
   }, []);
 
   useEffect(() => {
-    console.log('Jobs state updated:', jobs); // Log state updates
+    console.log('Jobs state updated:', jobs); 
   }, [jobs]);
 
   return (

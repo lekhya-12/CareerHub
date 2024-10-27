@@ -1,5 +1,3 @@
-// JobEditModal.jsx
-
 import React from 'react';
 import JobEditComponent from './JobEditComponent';
 

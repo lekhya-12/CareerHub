@@ -1,9 +1,6 @@
 import React from 'react'
 import "bootstrap/dist/css/bootstrap.min.css"
 import { useNavigate } from 'react-router-dom'
-import AllJobsComponent from './AllJobsComponent'
-//import logo from './'
-
 
 function HeaderComponent() {
   const nav=useNavigate()
@@ -29,10 +26,6 @@ function HeaderComponent() {
           <a class="nav-link active" href="#" onClick={()=>{nav('/job')}}>Jobs</a>
         </li>       
       </ul>
-      <form class="d-flex" role="search">
-        <input class="form-control me-2" type="search" placeholder="Search Jobs" aria-label="Search"/>
-        <button class="btn btn-outline-success" type="submit">Search</button>
-      </form>
       <button class="btn btn-outline-success" onClick={()=>{nav('/login')}}>Login</button>
     </div>
   </div>

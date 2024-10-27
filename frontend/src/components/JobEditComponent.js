@@ -1,15 +1,17 @@
-// JobEditComponent.jsx
-
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
 const JobEditComponent = ({ jobId, initialFormData, onClose }) => {
   const [formData, setFormData] = useState(initialFormData);
 
+  useEffect(() => {
+    setFormData(initialFormData);
+  }, [initialFormData]);
+
   const handleInputChange = (e) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
   };
 
@@ -19,7 +21,7 @@ const JobEditComponent = ({ jobId, initialFormData, onClose }) => {
       const response = await axios.put(`http://localhost:3128/job/edit/${jobId}`, formData);
       console.log('Job updated:', response.data);
       alert('Job updated successfully!');
-      onClose(); // Close the edit form after successful update
+      onClose(); 
     } catch (error) {
       console.error('Error updating job:', error);
       alert('Failed to update job');
@@ -28,7 +30,6 @@ const JobEditComponent = ({ jobId, initialFormData, onClose }) => {
 
   return (
     <div className="container">
-      <h2>Edit Job</h2>
       <form onSubmit={handleFormSubmit}>
         <div className="mb-3">
           <label htmlFor="jobTitle" className="form-label">Job Title</label>

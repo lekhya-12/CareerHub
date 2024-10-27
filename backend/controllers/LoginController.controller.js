@@ -1,6 +1,4 @@
-const mongoose=require("mongoose")
 const jwt=require("jsonwebtoken")
-//const LoginModel=require("../models/LoginModel.model")
 const EmployeeModel=require("../models/EmployeeModel.model")
 
 async function checkUser(req, res) {

@@ -1,22 +1,7 @@
-const mongoose=require("mongoose")
 const JobModel=require("../models/JobModel.model")
-const DiscussionController=require("./DiscussionController.controller")
-const DiscussionModel = require("../models/DiscussionModel.model")
-const AppliedJobModel = require("../models/AppliedJobModel.model"); // Import AppliedJobModel
+const AppliedJobModel = require("../models/AppliedJobModel.model");
 const EmployeeModel = require("../models/EmployeeModel.model")
 
-const getJobs=async (req,res)=>{
-
-    const jobs=await JobModel.find({})
-    if(!jobs){
-        return res.status(404).send({message:"Error finding jobs data"})
-    }
-    else
-        res.status(200).send(jobs);
-}
-
-
-//to be added in controller
 async function getHomeJobs(req,res){
 
     const jobs=await JobModel.find({})
@@ -27,85 +12,6 @@ async function getHomeJobs(req,res){
         res.status(200).send(jobs);
 }
 
-async function jobEditData(req,res){
-    const id=req.params.id;
-    const job=await JobModel.findOne({_jobId:id});
-    const comment= await DiscussionModel.find({ _jobId: id });
-    
-    if(!job)
-        return res.status(404) .send({message:"Error finding job"})
-   
-    else{
-        const comm = await DiscussionModel.findOne({ _jobId: req.params.id });
-        let j={}
-        if(!comm){
-             j={"job":job,"comment":'No comments found'}
-          // return res.status(404).send({ message:  });
-           
-          }
-          else
-          j={"job":job,"comment":comm}
-        //res.status(200).send(job)
-        
-    // res.render('job-edit', {
-    //      job,
-    //     comment,
-    //     // message: req.flash('success'),
-    //     // error: req.flash('error')
-    //   });
-    res.status(200).send(j)
-    }
-}
-
-async function jobEditSave(req,res){
-    const id=req.params.id;
-    if(id!=req.body._jobId)
-        return res.send({message:"ID mis-match"})
-    const job=await JobModel.findOne({_jobId:id})
-    if(!job){
-        return res.status(404).send({message:"Job with this id does not exist"})
-    }
-    else{
-        const edit=await JobModel.replaceOne({_jobId:id},req.body);
-        console.log(edit)
-        res.status(200).send("Updated Succesfully")
-    }
-}
-
-async function jobSave(req,res){
-    // const id=req.body._jobId
-    // console.log(req.body._jobId)
-
-    const j=await JobModel.findOne({_jobId:req.body._jobId})
-    
-    //console.log(j)
-    if(j){
-        return res.status(404).send({message :"Job with this id already exists"})
-    }
-    else {
-        const job=new JobModel(req.body)
-        await job.save();
-        res.status(200).send(job)
-
-    }
-}
-async function jobDelete(req,res){
-    //const j=await JobModel.find({})
-    const job=await JobModel.findOne({_jobId:req.params.id})
-  
-    if(!job){
-        return res.status(404).send('Job not found');
-    }
-    else{
-        const j=await JobModel.deleteOne({_jobId:req.params.id});
-        const comment= await DiscussionModel.findOne({ _jobId:req.params.id });
-        if(comment){
-            await DiscussionModel.deleteMany({ _jobId:req.params.id });
-        }
-        console.log(j)
-        res.status(200).send("Job deleted successfully")
-    }
-}
 async function applyForJob(req, res) {
   try {
     const { jobId, empId } = req.body;
@@ -124,7 +30,6 @@ async function applyForJob(req, res) {
 
 
 
-  // Example backend controller function
 async function updateJob(req, res) {
     const { jobId } = req.params;
     const { jobTitle, jobLocation, jobType, jobDesc, salary } = req.body;
@@ -146,72 +51,24 @@ async function updateJob(req, res) {
       res.status(500).json({ message: 'Internal server error' });
     }
   }
-  // const getAppliedJobs = async (req, res) => {
-  //   try {
-  //     const { empId } = req.params;
-  
-  //     console.log(`Fetching applied jobs for empId: ${empId}`);
-  
-  //     // Find applied jobs for the given employee ID
-  //     const appliedJobs = await AppliedJobModel.find({ empId });
-  //     if (appliedJobs.length === 0) {
-  //       return res.status(404).send({ message: 'No applied jobs found' });
-  //     }
-  
-  //     console.log('Applied jobs:', appliedJobs);
-  
-  //     // Extract jobIds from appliedJobs
-  //     const jobIds = appliedJobs.map(job => job.jobId);
-  
-  //     // Use aggregation pipeline to fetch job details
-  //     const jobs = await JobModel.aggregate([
-  //       { 
-  //         $match: { 
-  //           jobId: { $in: jobIds } // Match documents where jobId is in the jobIds array
-  //         }
-  //       }
-  //     ]);
-  
-  //     console.log('Fetched jobs:', jobs);
-  
-  //     if (jobs.length === 0) {
-  //       return res.status(404).send({ message: 'No job details found for applied jobs' });
-  //     }
-  
-  //     // Send job details to the frontend
-  //     res.status(200).send(jobs);
-  //   } catch (error) {
-  //     console.error('Error fetching applied jobs:', error);
-  //     res.status(500).send({ message: 'Internal server error' });
-  //   }
-  // };
   const getAppliedJobs = async (req, res) => {
     try {
       const { empId } = req.params;
-  
-      console.log(`Fetching applied jobs for empId: ${empId}`);
-  
-      // Find applied jobs for the given employee ID
       const appliedJobs = await AppliedJobModel.find({ empId });
       if (appliedJobs.length === 0) {
         return res.status(404).send({ message: 'No applied jobs found' });
       }
-  
-      console.log('Applied jobs:', appliedJobs);
-  
-      // Extract jobIds from appliedJobs
       const jobIds = appliedJobs.map(job => job.jobId);
   
-      // Use aggregation pipeline to fetch job details along with status
       const jobs = await JobModel.aggregate([
         { 
           $match: { 
-            jobId: { $in: jobIds } // Match documents where jobId is in the jobIds array
+            jobId: { $in: jobIds } 
           }
         },
         {
           $lookup: {
-            from: 'appliedjobs', // Collection name for AppliedJobModel
+            from: 'appliedjobs', 
             localField: 'jobId',
             foreignField: 'jobId',
             as: 'appliedJobs'
@@ -222,28 +79,25 @@ async function updateJob(req, res) {
         },
         {
           $match: {
-            'appliedJobs.empId': empId // Filter to ensure we only get the applied job for the specific employee
+            'appliedJobs.empId': empId 
           }
         },
         {
           $addFields: {
-            status: '$appliedJobs.status' // Get status from appliedJobs array
+            status: '$appliedJobs.status' 
           }
         },
         {
           $project: {
-            appliedJobs: 0 // Remove appliedJobs array from the result
+            appliedJobs: 0 
           }
         }
       ]);
-  
-      console.log('Fetched jobs:', jobs);
   
       if (jobs.length === 0) {
         return res.status(404).send({ message: 'No job details found for applied jobs' });
       }
   
-      // Send job details with status to the frontend
       res.status(200).send(jobs);
     } catch (error) {
       console.error('Error fetching applied jobs:', error);
@@ -254,45 +108,24 @@ async function updateJob(req, res) {
   
 const addJob = async (req, res) => {
   try {
-    console.log("reached 1");
     const job = await JobModel.create(req.body);
-    console.log("reached 2");
     res.status(201).json(job);
-    console.log("reached 3");
   } catch (error) {
-    console.error('Error adding job:', error); // Log the error
+    console.error('Error adding job:', error); 
     res.status(400).json({ message: error.message });
   }
 };
 
-
-// Edit a job
-const editJob = async (req, res) => {
-  const { jobId } = req.params;
-  try {
-    const updatedJob = await JobModel.findByIdAndUpdate(jobId, req.body, { new: true });
-    res.status(200).json(updatedJob);
-  } catch (error) {
-    res.status(400).json({ message: error.message });
-  }
-};
 const deleteJob = async (req, res) => {
   const { jobId } = req.params;
   try {
-    console.log("reached 1");
     console.log("jobId: ", jobId);
-
     const deletedJob = await JobModel.findOneAndDelete({ jobId: jobId });
-    console.log("reached 2");
-
     if (!deletedJob) {
       console.log("Job not found");
       return res.status(404).json({ message: 'Job not found' });
     }
-
-    console.log("reached 3");
     res.status(200).json({ message: 'Job deleted successfully', deletedJob });
-    console.log("reached 4");
   } catch (error) {
     console.error("Error deleting job:", error);
     res.status(400).json({ message: error.message });
@@ -300,34 +133,13 @@ const deleteJob = async (req, res) => {
 };
 async function getEmpHR(req,res){
   try {
-    console.log("reached 1")
     const employees = await EmployeeModel.find({ role: { $in: ['hr', 'employee'] } });
-    console.log("reached 2")
-
     res.status(200).json(employees);
-    console.log("reached 3")
-
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
-// async function viewEmp(req, res){
-//   const { jobId } = req.params;
-//   try {
-//     const applications = await AppliedJobModel.find({ jobId });
-//     if (!applications.length) {
-//       return res.status(404).json({ message: 'No applications found for this job' });
-//     }
-
-//     const empIds = applications.map(app => app.empId);
-//     const employees = await EmployeeModel.find({ empId: { $in: empIds } });
-//     res.status(200).json(employees);
-
-//   } catch (error) {
-//     res.status(500).json({ message: error.message });
-//   }
-// };
 async function viewEmp(req, res) {
   const { jobId } = req.params;
   try {
@@ -339,13 +151,11 @@ async function viewEmp(req, res) {
     const empIds = applications.map(app => app.empId);
     const employees = await EmployeeModel.find({ empId: { $in: empIds } });
 
-    // Create a map of employee IDs to their application status
     const statusMap = applications.reduce((map, app) => {
       map[app.empId] = app.status;
       return map;
     }, {});
 
-    // Combine employee data with their respective application status
     const employeeDetailsWithStatus = employees.map(employee => ({
       empId: employee.empId,
       email: employee.email,
@@ -360,12 +170,10 @@ async function viewEmp(req, res) {
   }
 }
 
-// Approve a job application
 const approveJobApplication = async (req, res) => {
   try {
     const { jobId, empId } = req.body;
 
-    // Find the applied job entry
     const appliedJob = await AppliedJobModel.findOneAndUpdate(
       { jobId, empId },
       { $set: { status: 'approve' } },
@@ -381,12 +189,10 @@ const approveJobApplication = async (req, res) => {
   }
 };
 
-// Reject a job application
 const rejectJobApplication = async (req, res) => {
   try {
     const { jobId, empId } = req.body;
 
-    // Find and update status to 'reject' in AppliedJobModel
     const appliedJob = await AppliedJobModel.findOneAndUpdate(
       { jobId, empId },
       { $set: { status: 'reject' } },
@@ -407,4 +213,4 @@ const rejectJobApplication = async (req, res) => {
 
 
 
-module.exports={getJobs,getHomeJobs,jobEditData,jobEditSave,jobSave,jobDelete,applyForJob,updateJob,getAppliedJobs,addJob,deleteJob,editJob,getEmpHR,viewEmp,rejectJobApplication,approveJobApplication}
+module.exports={getHomeJobs,applyForJob,updateJob,getAppliedJobs,addJob,deleteJob,getEmpHR,viewEmp,rejectJobApplication,approveJobApplication}

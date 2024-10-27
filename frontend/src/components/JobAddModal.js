@@ -4,7 +4,7 @@ import axios from 'axios';
 const JobAddModal = ({ onClose }) => {
   const [formData, setFormData] = useState({
     jobTitle: '',
-    jobId: '', // Add jobId state
+    jobId: '', 
     jobLocation: '',
     jobType: '',
     jobDesc: '',
@@ -25,7 +25,7 @@ const JobAddModal = ({ onClose }) => {
       const response = await axios.post('http://localhost:3128/job/add', formData);
       console.log('Job added:', response.data);
       alert('Job added successfully!');
-      onClose(); // Close modal after adding job
+      onClose(); 
     } catch (error) {
       console.error('Error adding job:', error);
     }

@@ -32,7 +32,7 @@ const HRJobsComponent = () => {
   const handleDelete = async (jobId) => {
     try {
       await axios.delete(`http://localhost:3128/job/delete/${jobId}`);
-      fetchJobs(); // Update job list after deletion
+      fetchJobs(); 
     } catch (error) {
       console.error('Error deleting job:', error);
     }
@@ -44,7 +44,7 @@ const HRJobsComponent = () => {
 
   const handleCloseAddModal = () => {
     setShowAddModal(false);
-    fetchJobs(); // Update job list after adding new job
+    fetchJobs(); 
   };
 
   const handleViewApplicantions = (jobId) => {
@@ -65,10 +65,9 @@ const HRJobsComponent = () => {
     try {
       await axios.post('http://localhost:3128/job/approve', { jobId, empId });
       alert("approved");
-      // After successful approval, refresh applicants and jobs
     await fetchApplicants(jobId);
     await fetchJobs();
-    setSelectedJobId(null); // Close modal
+    setSelectedJobId(null); 
       
     } catch (error) {
       console.error('Error approving job application:', error);
@@ -81,7 +80,7 @@ const HRJobsComponent = () => {
       alert("rejected");
       await fetchApplicants(jobId);
     await fetchJobs();
-    setSelectedJobId(null); // Close modal
+    setSelectedJobId(null); 
       
     } catch (error) {
       console.error('Error rejecting job application:', error);
@@ -165,8 +164,8 @@ const HRJobsComponent = () => {
             salary: '',
           }}
           onClose={() => {
-            setEditJobId(null);
-            fetchJobs(); // Update job list after editing
+            setEditJobId();
+            fetchJobs(); 
           }}
         />
       )}

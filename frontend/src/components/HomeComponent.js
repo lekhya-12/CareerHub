@@ -1,10 +1,8 @@
 
-
 import React from 'react';
 import FooterComponent from './FooterComponent';
 import HeaderComponent from './HeaderComponent';
-import './HomeComponent.css'; // Import the CSS file
-import NavbarComponent from './NavBarComponent';
+import './HomeComponent.css'; 
 
 function HomeComponent() {
   return (
